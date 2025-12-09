@@ -1,84 +1,81 @@
-import pygame
-import sys
+"""算界旅人 - 游戏入口。"""
+
 import asyncio
-from storage import save_game, load_game
+import sys
 
-# 初始化 Pygame
-pygame.init()
+import pygame
 
-# 屏幕设置
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("My RPG Game")
+from src.core.config import SCREEN_WIDTH, SCREEN_HEIGHT
+from src.menu.screens import MainMenuScreen, SaveMenuScreen
+from src.scenes import GameScene
 
-# 颜色定义
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-PLAYER_COLOR = (0, 128, 255)
-
-# 玩家设置
-player_size = 40
-# 初始位置
-default_pos = [SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2]
-# 尝试加载存档，如果没有则使用默认位置
-saved_data = load_game("save.json", {"pos": default_pos})
-player_pos = saved_data["pos"]
-
-player_speed = 5
 
 async def main():
-    # 游戏主循环
+    """主函数。"""
+    pygame.init()
+
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
+    pygame.display.set_caption("算界旅人")
     clock = pygame.time.Clock()
-    running = True
 
-    while running:
-        # 1. 事件处理
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                # 退出前自动保存
-                save_game({"pos": player_pos}, "save.json")
-                running = False
-            
-            # 按 'S' 键手动保存
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_s:
-                    save_game({"pos": player_pos}, "save.json")
-                    print("Game Saved!")
+    state = "menu"
+    selected_slot = 1
 
-        # 2. 获取按键输入
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            player_pos[0] -= player_speed
-        if keys[pygame.K_RIGHT]:
-            player_pos[0] += player_speed
-        if keys[pygame.K_UP]:
-            player_pos[1] -= player_speed
-        if keys[pygame.K_DOWN]:
-            player_pos[1] += player_speed
+    while True:
+        if state == "menu":
+            menu = MainMenuScreen(screen)
+            result = menu.run()
 
-        # 3. 绘制
-        screen.fill(BLACK)  # 清屏
-        
-        # 绘制玩家 (暂时用矩形代替)
-        pygame.draw.rect(screen, PLAYER_COLOR, (player_pos[0], player_pos[1], player_size, player_size))
-        
-        # 绘制提示文字
-        font = pygame.font.SysFont(None, 24)
-        img = font.render('Press S to Save', True, WHITE)
-        screen.blit(img, (20, 20))
+            if result == "new":
+                state = "save_menu_new"
+            elif result == "load_menu":
+                state = "load_menu"
+            elif result == "quit":
+                break
 
-        # 刷新屏幕
-        pygame.display.flip()
+        elif state == "save_menu_new":
+            save_menu = SaveMenuScreen(screen, mode="save")
+            result = save_menu.run()
 
-        # 控制帧率
-        clock.tick(60)
-        
-        # 关键：交出控制权给浏览器，否则网页会卡死
+            if result is None:
+                state = "menu"
+            elif result.get("action") == "save":
+                selected_slot = result["slot"]
+                state = "game_new"
+
+        elif state == "load_menu":
+            save_menu = SaveMenuScreen(screen, mode="load")
+            result = save_menu.run()
+
+            if result is None:
+                state = "menu"
+            elif result.get("action") == "load":
+                selected_slot = result["slot"]
+                state = "game_continue"
+
+        elif state == "game_new":
+            scene = GameScene(is_new_game=True, slot=selected_slot)
+            result = scene.run(screen, clock)
+
+            if result == "main_menu":
+                state = "menu"
+            else:
+                break
+
+        elif state == "game_continue":
+            scene = GameScene(is_new_game=False, slot=selected_slot)
+            result = scene.run(screen, clock)
+
+            if result == "main_menu":
+                state = "menu"
+            else:
+                break
+
         await asyncio.sleep(0)
 
     pygame.quit()
     sys.exit()
+
 
 if __name__ == "__main__":
     asyncio.run(main())
