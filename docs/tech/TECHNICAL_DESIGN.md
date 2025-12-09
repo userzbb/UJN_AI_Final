@@ -11,6 +11,7 @@
 | **Architecture** | **esper** | 3.0+ | 轻量级 ECS 框架，管理游戏逻辑实体与系统。 |
 | **Rich Text** | **Rich** | 13.0+ | (Textual 内置) 处理彩色文本、表格、Markdown 渲染。 |
 | **Data Validation** | **pydantic** | 2.0+ | 强类型数据模型定义与校验。 |
+| **Configuration** | **TOML** | (StdLib 3.11+) | 用于配置文件，特别是按键映射 (Keybindings)。 |
 | **Storage** | **sqlite3** | - | 标准库，用于存档管理。 |
 
 ---
@@ -39,12 +40,17 @@
 
 ```text
 UJN_AI_Final/
+├── config/                 # [NEW] 用户配置
+│   └── keybindings.toml    # 按键映射配置文件
 ├── assets/                 # 资源
 │   ├── data/               # JSON 数据 (items, enemies, skills, talents)
 │   ├── maps/               # 文本地图 (.txt)
 │   └── tcss/               # Textual CSS 样式表
 ├── src/                    # 源代码
 │   ├── app.py              # Textual App 入口 (UI 主循环)
+│   ├── core/               # [NEW] 核心系统
+│   │   ├── config.py       # 配置加载器 (TOML Parser)
+│   │   └── input_map.py    # 输入动作映射 (Action Mapper)
 │   ├── screens/            # Textual 屏幕
 │   │   ├── main_menu.py    # 主菜单
 │   │   ├── game_screen.py  # 游戏主界面 (探索)
@@ -75,6 +81,37 @@ UJN_AI_Final/
 ├── main.py                 # 启动脚本
 └── pyproject.toml          # 依赖配置
 ```
+
+### 3.3 配置系统 (Configuration System)
+
+为了实现类似 Vim/Helix 的自定义按键，我们将采用 **TOML** 格式存储键位映射。
+
+**数据规范 (Data Specification):**
+
+配置文件 `config/keybindings.toml` 示例：
+
+```toml
+[keys.normal]
+"h" = "move_left"
+"j" = "move_down"
+"k" = "move_up"
+"l" = "move_right"
+":" = "command_mode"
+"i" = "insert_mode"
+"space" = "open_picker"
+
+[keys.command]
+"escape" = "cancel"
+"enter" = "submit"
+
+[keys.insert]
+"escape" = "normal_mode"
+```
+
+**实现逻辑:**
+1.  **Action Registry**: 在代码中定义所有可能的动作字符串 (如 `"move_left"`, `"command_mode"`)。
+2.  **Input Mapper**: `src/core/input_map.py` 负责加载 TOML 文件，将物理按键 (Key) 映射到 逻辑动作 (Action)。
+3.  **Event Handling**: Textual 的 `on_key` 事件不再硬编码逻辑，而是查询 Input Mapper：`action = input_mapper.get_action(event.key, current_mode)`。
 
 ---
 

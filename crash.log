@@ -1,0 +1,60 @@
+ERROR:root:Crash in action_open_picker
+Traceback (most recent call last):
+  File "/home/zi/Documents/code/python/UJN_AI_Final/src/screens/game_screen.py", line 166, in action_open_picker
+    self.app.push_screen(SpaceMenu(), self._handle_space_menu_result)
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/app.py", line 2820, in push_screen
+    self._load_screen_css(next_screen)
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/app.py", line 2733, in _load_screen_css
+    self.stylesheet.reparse()
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/stylesheet.py", line 427, in reparse
+    stylesheet.parse()
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/stylesheet.py", line 390, in parse
+    css_rules = self._parse_rules(
+                ^^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/stylesheet.py", line 269, in _parse_rules
+    rules = list(
+            ^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/parse.py", line 482, in parse
+    yield from parse_rule_set(
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/parse.py", line 171, in parse_rule_set
+    token = next(tokens)
+            ^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/parse.py", line 389, in substitute_references
+    token = next(iter_tokens, None)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/tokenize.py", line 257, in __call__
+    token = get_token(expect)
+            ^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/tokenizer.py", line 326, in get_token
+    raise TokenError(
+textual.css.tokenizer.TokenError: unknown pseudo-class 'highlighted'; did you mean 'light'?; must be one of 'ansi', 'blur', 'can-focus', 'dark', 'disabled', 'empty', 'enabled', 'even', 'first-child', 'first-of-type', 'focus', 'focus-within', 'hover', 'inline', 'last-child', 'last-of-type', 'light', 'nocolor', or 'odd'
+ERROR:root:Crash in action_open_picker
+Traceback (most recent call last):
+  File "/home/zi/Documents/code/python/UJN_AI_Final/src/screens/game_screen.py", line 166, in action_open_picker
+    self.app.push_screen(SpaceMenu(), self._handle_space_menu_result)
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/app.py", line 2820, in push_screen
+    self._load_screen_css(next_screen)
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/app.py", line 2733, in _load_screen_css
+    self.stylesheet.reparse()
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/stylesheet.py", line 427, in reparse
+    stylesheet.parse()
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/stylesheet.py", line 390, in parse
+    css_rules = self._parse_rules(
+                ^^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/stylesheet.py", line 269, in _parse_rules
+    rules = list(
+            ^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/parse.py", line 482, in parse
+    yield from parse_rule_set(
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/parse.py", line 171, in parse_rule_set
+    token = next(tokens)
+            ^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/parse.py", line 389, in substitute_references
+    token = next(iter_tokens, None)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/tokenize.py", line 257, in __call__
+    token = get_token(expect)
+            ^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/tokenizer.py", line 326, in get_token
+    raise TokenError(
+textual.css.tokenizer.TokenError: unknown pseudo-class 'highlighted'; did you mean 'light'?; must be one of 'ansi', 'blur', 'can-focus', 'dark', 'disabled', 'empty', 'enabled', 'even', 'first-child', 'first-of-type', 'focus', 'focus-within', 'hover', 'inline', 'last-child', 'last-of-type', 'light', 'nocolor', or 'odd'

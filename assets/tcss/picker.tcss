@@ -1,0 +1,73 @@
+EquipmentPicker, SpaceMenu, SaveLoadPicker {
+    align: center middle;
+    background: rgba(0,0,0,0.7);
+}
+
+#picker-container {
+    width: 80%;
+    height: 70%;
+    background: #1A1110;
+    border: double #7aa2f7;
+    padding: 1;
+}
+
+#picker-title {
+    width: 100%;
+    content-align: center middle;
+    background: #7aa2f7;
+    color: #1A1110;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+#picker-content {
+    height: 1fr;
+}
+
+#slot-list-container {
+    width: 40%;
+    height: 100%;
+    border-right: solid #565f89;
+    padding-right: 1;
+}
+
+#item-details {
+    width: 60%;
+    height: 100%;
+    padding-left: 2;
+}
+
+#item-name {
+    text-style: bold;
+    border-bottom: solid #565f89;
+    margin-bottom: 1;
+    height: 3;
+    content-align: center middle;
+}
+
+#item-lore {
+    height: 1fr;
+    color: #a9b1d6;
+}
+
+#item-stats {
+    height: 5;
+    border-top: dashed #565f89;
+    color: #9ece6a;
+}
+
+ListView {
+    height: 100%;
+    border: none;
+}
+
+ListItem {
+    padding: 1;
+    background: #1A1110;
+}
+
+ListItem:highlighted {
+    background: #2ac3de;
+    color: #1A1110;
+    text-style: bold;
+}

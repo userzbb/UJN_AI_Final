@@ -1,0 +1,84 @@
+ERROR:root:Crash in TitleScreen load game
+Traceback (most recent call last):
+  File "/home/zi/Documents/code/python/UJN_AI_Final/src/screens/title_screen.py", line 74, in _handle_menu_selection
+    self.app.push_screen(SaveLoadPicker(current_state=None), self._handle_load_result)
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/app.py", line 2820, in push_screen
+    self._load_screen_css(next_screen)
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/app.py", line 2733, in _load_screen_css
+    self.stylesheet.reparse()
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/stylesheet.py", line 427, in reparse
+    stylesheet.parse()
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/stylesheet.py", line 390, in parse
+    css_rules = self._parse_rules(
+                ^^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/stylesheet.py", line 269, in _parse_rules
+    rules = list(
+            ^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/parse.py", line 482, in parse
+    yield from parse_rule_set(
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/parse.py", line 171, in parse_rule_set
+    token = next(tokens)
+            ^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/parse.py", line 389, in substitute_references
+    token = next(iter_tokens, None)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/tokenize.py", line 257, in __call__
+    token = get_token(expect)
+            ^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/tokenizer.py", line 326, in get_token
+    raise TokenError(
+textual.css.tokenizer.TokenError: unknown pseudo-class 'highlighted'; did you mean 'light'?; must be one of 'ansi', 'blur', 'can-focus', 'dark', 'disabled', 'empty', 'enabled', 'even', 'first-child', 'first-of-type', 'focus', 'focus-within', 'hover', 'inline', 'last-child', 'last-of-type', 'light', 'nocolor', or 'odd'
+ERROR:root:Crash in TitleScreen load game
+Traceback (most recent call last):
+  File "/home/zi/Documents/code/python/UJN_AI_Final/src/screens/title_screen.py", line 74, in _handle_menu_selection
+    self.app.push_screen(SaveLoadPicker(current_state=None), self._handle_load_result)
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/app.py", line 2820, in push_screen
+    self._load_screen_css(next_screen)
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/app.py", line 2733, in _load_screen_css
+    self.stylesheet.reparse()
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/stylesheet.py", line 427, in reparse
+    stylesheet.parse()
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/stylesheet.py", line 390, in parse
+    css_rules = self._parse_rules(
+                ^^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/stylesheet.py", line 269, in _parse_rules
+    rules = list(
+            ^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/parse.py", line 482, in parse
+    yield from parse_rule_set(
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/parse.py", line 171, in parse_rule_set
+    token = next(tokens)
+            ^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/parse.py", line 389, in substitute_references
+    token = next(iter_tokens, None)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/tokenize.py", line 257, in __call__
+    token = get_token(expect)
+            ^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/css/tokenizer.py", line 326, in get_token
+    raise TokenError(
+textual.css.tokenizer.TokenError: unknown pseudo-class 'highlighted'; did you mean 'light'?; must be one of 'ansi', 'blur', 'can-focus', 'dark', 'disabled', 'empty', 'enabled', 'even', 'first-child', 'first-of-type', 'focus', 'focus-within', 'hover', 'inline', 'last-child', 'last-of-type', 'light', 'nocolor', or 'odd'
+ERROR:root:Crash in _do_delete
+Traceback (most recent call last):
+  File "/home/zi/Documents/code/python/UJN_AI_Final/src/widgets/save_load_picker.py", line 126, in _do_delete
+    self._populate_list()
+  File "/home/zi/Documents/code/python/UJN_AI_Final/src/widgets/save_load_picker.py", line 63, in _populate_list
+    list_view.append(ListItem(Label(label), id=f"save-{s_id}"))
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/widgets/_list_view.py", line 259, in append
+    return self.extend([item])
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/widgets/_list_view.py", line 246, in extend
+    await_mount = self.mount(*items)
+                  ^^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/widget.py", line 1437, in mount
+    mounted = self.app._register(
+              ^^^^^^^^^^^^^^^^^^^
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/app.py", line 3524, in _register
+    self._register_child(parent, widget, before, after)
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/app.py", line 3470, in _register_child
+    parent._nodes._append(child)
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/_node_list.py", line 129, in _append
+    self._ensure_unique_id(widget_id)
+  File "/home/zi/Documents/code/python/UJN_AI_Final/.venv/lib/python3.12/site-packages/textual/_node_list.py", line 158, in _ensure_unique_id
+    raise DuplicateIds(
+textual._node_list.DuplicateIds: Tried to insert a widget with ID 'save-3', but a widget already exists with that ID (ListItem(id='save-3')); ensure all child widgets have a unique ID.

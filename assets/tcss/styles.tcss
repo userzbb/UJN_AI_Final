@@ -1,0 +1,6 @@
+GameGrid {
+    width: 100%;
+    height: 100%;
+    background: #1A1110;
+    color: white;
+}
