@@ -15,3 +15,4 @@ wheels/
 # log
 crash_title.log
 crash.log
+saves.db

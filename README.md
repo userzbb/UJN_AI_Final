@@ -21,6 +21,9 @@
 
 *   Python 3.10+
 *   支持真彩色 (True Color) 的终端 (如 Alacritty, Kitty, iTerm2, Windows Terminal, VS Code Terminal)
+*   **推荐字体**: 本项目包含并推荐使用 `assets/fonts/MapleMonoNormalNL-NF-CN-Regular.ttf`。
+    *   这是一个 Nerd Font，包含游戏所需的图标。
+    *   请安装该字体并将您的终端字体设置为 "Maple Mono NF CN"。
 *   已安装 `uv` (推荐) 或 `pip`
 
 ### 安装与运行
