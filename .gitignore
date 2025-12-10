@@ -8,4 +8,10 @@ wheels/
 
 # Virtual environments
 .venv
+
+#vscode_config
 .vscode
+
+# log
+crash_title.log
+crash.log

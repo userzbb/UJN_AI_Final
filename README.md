@@ -58,6 +58,83 @@
 | `:w` | 保存游戏 |
 | `:q` | 退出到主菜单 |
 
+## 🛠️ 技术栈 (Tech Stack)
+
+本项目采用现代 Python 技术栈构建，追求高性能与开发体验：
+
+*   **核心语言**: Python 3.10+
+*   **TUI 框架**: [Textual](https://textual.textualize.io/) - 用于构建现代化的终端用户界面。
+*   **ECS 引擎**: [Esper](https://github.com/benmoran56/esper) - 轻量级实体组件系统，解耦游戏逻辑。
+*   **数据存储**: SQLite - 用于游戏存档与持久化。
+*   **包管理**: [uv](https://github.com/astral-sh/uv) - 极速 Python 包管理器。
+*   **数据格式**: JSON (物品/配置) + Plain Text (地图)。
+
+## 📂 项目结构 (Project Structure)
+
+```text
+UJN_AI_Final/
+├── assets/                 # 游戏资源
+│   ├── data/               # JSON 数据 (物品, 敌人等)
+│   ├── docs/               # 文档与剧情文本
+│   ├── maps/               # ASCII 地图文件
+│   └── tcss/               # Textual CSS 样式表
+├── src/                    # 源代码
+│   ├── components/         # ECS 组件 (Data Classes)
+│   ├── data/               # 数据库与持久化逻辑
+│   ├── screens/            # 游戏屏幕 (Title, Game)
+│   ├── systems/            # ECS 系统 (Render, Movement)
+│   ├── utils/              # 工具函数 (Map Loader)
+│   └── widgets/            # UI 组件 (Grid, Picker, StatusBar)
+├── main.py                 # 程序入口
+├── pyproject.toml          # 项目配置与依赖
+└── README.md               # 你在这里
+```
+
+## 💾 数据规范 (Data Specifications)
+
+### 1. 物品数据 (`assets/data/items.json`)
+物品定义采用 JSON 格式，支持灵活的属性扩展：
+
+```json
+{
+  "id": "diff_blade_01",      // 唯一标识符
+  "name": "差分之刃",          // 显示名称
+  "type": "weapon",           // 类型: weapon, armor, accessory
+  "stats": {                  // 属性加成
+    "atk": 15,
+    "spd": -2
+  },
+  "description": "..."        // 物品描述 (Lore)
+}
+```
+
+### 2. 地图格式 (`assets/maps/*.txt`)
+地图使用纯文本 ASCII 字符绘制，所见即所得：
+*   `#`: 墙壁 (不可通行)
+*   `.`: 地板 (可通行)
+*   `@`: 玩家起始位置
+*   `+`: 门
+
+### 3. 存档数据库 (`saves.db`)
+使用 SQLite 存储，主要包含两张表：
+*   `save_metadata`: 存储基础信息 (时间戳, 地图名, 玩家坐标)。
+*   `equipment`: 存储玩家当前装备栏状态 (一对多关联)。
+
+## 📚 深度文档 (Documentation)
+
+项目根目录下的 `docs/` 文件夹包含了详细的设计文档与技术规范，是深入了解 TimeStack 世界观与架构的必读材料：
+
+### 🎨 设计文档 (`docs/design/`)
+*   **[CORE_GAMEPLAY.md](docs/design/CORE_GAMEPLAY.md)**: 核心玩法机制详解（战斗、探索、交互）。
+*   **[MAIN_STORY.md](docs/design/MAIN_STORY.md)**: 游戏主线剧情大纲与叙事结构。
+*   **[ERA_MECHANICAL_COMPUTING.md](docs/design/ERA_MECHANICAL_COMPUTING.md)**: "机械计算时代" 的详细设定（敌人、环境、物品）。
+
+### ⚙️ 技术文档 (`docs/tech/`)
+*   **[TECHNICAL_DESIGN.md](docs/tech/TECHNICAL_DESIGN.md)**: 系统架构设计，包括 ECS 实体组件关系图与模块划分。
+*   **[GAME_DATA_SCHEMA.md](docs/tech/GAME_DATA_SCHEMA.md)**: 详细的数据结构定义（JSON Schema, 数据库表结构）。
+
+> 💡 **提示**: 如果你想为游戏添加新的时代或功能，请先阅读对应的设计文档。
+
 ## 🤝 参与贡献
 
 我们正在打造一份致敬计算机发展史的开源献礼，我们需要 **你** 的加入！
