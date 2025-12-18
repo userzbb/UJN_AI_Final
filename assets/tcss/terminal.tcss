@@ -1,0 +1,58 @@
+s/* 终端模拟器样式 */
+
+Terminal {
+    width: 100%;
+    height: 100%;
+    background: #1a1b26;
+    border: solid #7aa2f7;
+    padding: 1;
+}
+
+Terminal #terminal-history {
+    width: 100%;
+    height: 1fr;
+    scrollbar-size: 1 1;
+    scrollbar-background: #1a1b26;
+    scrollbar-color: #565f89;
+    scrollbar-color-hover: #7aa2f7;
+    scrollbar-color-active: #7dcfff;
+}
+
+Terminal .output-line {
+    color: #c0caf5;
+}
+
+Terminal .output-line.error {
+    color: #f7768e;
+}
+
+Terminal .output-line.success {
+    color: #9ece6a;
+}
+
+Terminal .output-line.info {
+    color: #7aa2f7;
+}
+
+Terminal .command-echo {
+    color: #565f89;
+}
+
+TerminalPrompt .prompt-text {
+    color: #9ece6a;
+}
+
+TerminalPrompt .prompt-input {
+    background: transparent;
+    border: none;
+    color: #c0caf5;
+}
+
+TerminalPrompt .prompt-input:focus {
+    border: none;
+}
+
+/* 光标闪烁效果 */
+TerminalPrompt .prompt-input.-cursor-blink {
+    text-style: reverse;
+}

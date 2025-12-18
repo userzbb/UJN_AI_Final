@@ -1,174 +1,273 @@
+"""
+数据库管理模块
+SQLite 数据库封装，管理用户和虚拟文件系统
+"""
 import sqlite3
-import os
-import json
+from pathlib import Path
+from contextlib import contextmanager
+from typing import Any, Generator
 from datetime import datetime
-from typing import Optional, Dict, Any
 
-class SaveManager:
-    DB_NAME = "saves.db"
 
-    def __init__(self):
-        self.db_path = os.path.join(os.getcwd(), self.DB_NAME)
-        self._init_db()
-
-    def _get_conn(self):
-        return sqlite3.connect(self.db_path)
-
-    def _init_db(self):
-        conn = self._get_conn()
-        cursor = conn.cursor()
-        
-        # 1. Save Metadata
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS save_metadata (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                timestamp TEXT,
-                map_name TEXT,
-                player_x INTEGER,
-                player_y INTEGER
-            )
-        ''')
-
-        # 2. Equipment
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS equipment (
-                save_id INTEGER,
-                slot TEXT,
-                item_id TEXT,
-                FOREIGN KEY(save_id) REFERENCES save_metadata(id)
-            )
-        ''')
-        
-        # 3. Player Stats (Placeholder for now)
-        # cursor.execute(...)
-
-        conn.commit()
-        conn.close()
-
-    def save_game(self, map_name: str, player_pos: tuple[int, int], equipment_slots: Dict[str, Optional[str]]) -> int:
-        conn = self._get_conn()
-        cursor = conn.cursor()
-        
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Insert Metadata
-        cursor.execute('''
-            INSERT INTO save_metadata (timestamp, map_name, player_x, player_y)
-            VALUES (?, ?, ?, ?)
-        ''', (timestamp, map_name, player_pos[0], player_pos[1]))
-        
-        save_id = cursor.lastrowid
-        
-        # Insert Equipment
-        for slot, item_id in equipment_slots.items():
-            if item_id:
-                cursor.execute('''
-                    INSERT INTO equipment (save_id, slot, item_id)
-                    VALUES (?, ?, ?)
-                ''', (save_id, slot, item_id))
-        
-        conn.commit()
-        conn.close()
-        return save_id
-
-    def load_latest_save(self) -> Optional[Dict[str, Any]]:
-        conn = self._get_conn()
-        cursor = conn.cursor()
-        
-        # Get latest save
-        cursor.execute('SELECT * FROM save_metadata ORDER BY id DESC LIMIT 1')
-        row = cursor.fetchone()
-        
-        if not row:
+class Database:
+    """SQLite 数据库封装类"""
+    
+    def __init__(self, db_path: str | Path = "save/game.db"):
+        self.db_path = Path(db_path)
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._init_tables()
+    
+    @contextmanager
+    def connection(self) -> Generator[sqlite3.Connection, None, None]:
+        """获取数据库连接的上下文管理器"""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row  # 允许通过列名访问
+        try:
+            yield conn
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
             conn.close()
-            return None
+    
+    def _init_tables(self) -> None:
+        """初始化数据库表"""
+        with self.connection() as conn:
+            cursor = conn.cursor()
             
-        save_id, timestamp, map_name, px, py = row
-        
-        # Get equipment
-        cursor.execute('SELECT slot, item_id FROM equipment WHERE save_id = ?', (save_id,))
-        equip_rows = cursor.fetchall()
-        equipment = {slot: item_id for slot, item_id in equip_rows}
-        
-        conn.close()
-        
-        return {
-            "id": save_id,
-            "timestamp": timestamp,
-            "map_name": map_name,
-            "player_pos": (px, py),
-            "equipment": equipment
-        }
-
-    def load_save_by_id(self, save_id: int) -> Optional[Dict[str, Any]]:
-        conn = self._get_conn()
-        cursor = conn.cursor()
-        
-        cursor.execute('SELECT * FROM save_metadata WHERE id = ?', (save_id,))
-        row = cursor.fetchone()
-        
-        if not row:
-            conn.close()
-            return None
+            # 用户表
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_login TIMESTAMP,
+                    current_path TEXT DEFAULT '/'
+                )
+            """)
             
-        s_id, timestamp, map_name, px, py = row
+            # 虚拟文件系统表
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS vfs_nodes (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    parent_id INTEGER,
+                    name TEXT NOT NULL,
+                    is_directory BOOLEAN DEFAULT FALSE,
+                    content TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                    FOREIGN KEY (parent_id) REFERENCES vfs_nodes(id) ON DELETE CASCADE,
+                    UNIQUE(user_id, parent_id, name)
+                )
+            """)
+            
+            # 创建索引
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS idx_vfs_user_parent 
+                ON vfs_nodes(user_id, parent_id)
+            """)
+    
+    # ==================== 用户操作 ====================
+    
+    def create_user(self, username: str, password_hash: str) -> int | None:
+        """
+        创建新用户
         
-        # Get equipment
-        cursor.execute('SELECT slot, item_id FROM equipment WHERE save_id = ?', (s_id,))
-        equip_rows = cursor.fetchall()
-        equipment = {slot: item_id for slot, item_id in equip_rows}
+        Returns:
+            用户ID，如果用户名已存在则返回 None
+        """
+        try:
+            with self.connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+                    (username, password_hash)
+                )
+                return cursor.lastrowid
+        except sqlite3.IntegrityError:
+            return None
+    
+    def get_user_by_username(self, username: str) -> dict[str, Any] | None:
+        """通过用户名获取用户信息"""
+        with self.connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT * FROM users WHERE username = ?",
+                (username,)
+            )
+            row = cursor.fetchone()
+            return dict(row) if row else None
+    
+    def get_user_by_id(self, user_id: int) -> dict[str, Any] | None:
+        """通过ID获取用户信息"""
+        with self.connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT * FROM users WHERE id = ?",
+                (user_id,)
+            )
+            row = cursor.fetchone()
+            return dict(row) if row else None
+    
+    def update_user_login(self, user_id: int) -> None:
+        """更新用户最后登录时间"""
+        with self.connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE users SET last_login = ? WHERE id = ?",
+                (datetime.now(), user_id)
+            )
+    
+    def update_user_path(self, user_id: int, path: str) -> None:
+        """更新用户当前路径"""
+        with self.connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE users SET current_path = ? WHERE id = ?",
+                (path, user_id)
+            )
+    
+    # ==================== 虚拟文件系统操作 ====================
+    
+    def create_vfs_node(
+        self,
+        user_id: int,
+        parent_id: int | None,
+        name: str,
+        is_directory: bool = False,
+        content: str | None = None
+    ) -> int | None:
+        """
+        创建虚拟文件系统节点
         
-        conn.close()
-        
-        return {
-            "id": s_id,
-            "timestamp": timestamp,
-            "map_name": map_name,
-            "player_pos": (px, py),
-            "equipment": equipment
-        }
+        Returns:
+            节点ID，如果已存在同名节点则返回 None
+        """
+        try:
+            with self.connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    """INSERT INTO vfs_nodes 
+                       (user_id, parent_id, name, is_directory, content)
+                       VALUES (?, ?, ?, ?, ?)""",
+                    (user_id, parent_id, name, is_directory, content)
+                )
+                return cursor.lastrowid
+        except sqlite3.IntegrityError:
+            return None
+    
+    def get_vfs_node(self, node_id: int) -> dict[str, Any] | None:
+        """获取节点信息"""
+        with self.connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT * FROM vfs_nodes WHERE id = ?",
+                (node_id,)
+            )
+            row = cursor.fetchone()
+            return dict(row) if row else None
+    
+    def get_vfs_node_by_path(
+        self,
+        user_id: int,
+        parent_id: int | None,
+        name: str
+    ) -> dict[str, Any] | None:
+        """通过父节点ID和名称获取节点"""
+        with self.connection() as conn:
+            cursor = conn.cursor()
+            if parent_id is None:
+                cursor.execute(
+                    """SELECT * FROM vfs_nodes 
+                       WHERE user_id = ? AND parent_id IS NULL AND name = ?""",
+                    (user_id, name)
+                )
+            else:
+                cursor.execute(
+                    """SELECT * FROM vfs_nodes 
+                       WHERE user_id = ? AND parent_id = ? AND name = ?""",
+                    (user_id, parent_id, name)
+                )
+            row = cursor.fetchone()
+            return dict(row) if row else None
+    
+    def get_vfs_children(
+        self,
+        user_id: int,
+        parent_id: int | None
+    ) -> list[dict[str, Any]]:
+        """获取目录下的所有子节点"""
+        with self.connection() as conn:
+            cursor = conn.cursor()
+            if parent_id is None:
+                cursor.execute(
+                    """SELECT * FROM vfs_nodes 
+                       WHERE user_id = ? AND parent_id IS NULL
+                       ORDER BY is_directory DESC, name ASC""",
+                    (user_id,)
+                )
+            else:
+                cursor.execute(
+                    """SELECT * FROM vfs_nodes 
+                       WHERE user_id = ? AND parent_id = ?
+                       ORDER BY is_directory DESC, name ASC""",
+                    (user_id, parent_id)
+                )
+            return [dict(row) for row in cursor.fetchall()]
+    
+    def update_vfs_node_content(self, node_id: int, content: str) -> bool:
+        """更新文件内容"""
+        with self.connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """UPDATE vfs_nodes 
+                   SET content = ?, updated_at = ? 
+                   WHERE id = ? AND is_directory = FALSE""",
+                (content, datetime.now(), node_id)
+            )
+            return cursor.rowcount > 0
+    
+    def rename_vfs_node(self, node_id: int, new_name: str) -> bool:
+        """重命名节点"""
+        try:
+            with self.connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    """UPDATE vfs_nodes 
+                       SET name = ?, updated_at = ? 
+                       WHERE id = ?""",
+                    (new_name, datetime.now(), node_id)
+                )
+                return cursor.rowcount > 0
+        except sqlite3.IntegrityError:
+            return False
+    
+    def delete_vfs_node(self, node_id: int) -> bool:
+        """删除节点（级联删除子节点）"""
+        with self.connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "DELETE FROM vfs_nodes WHERE id = ?",
+                (node_id,)
+            )
+            return cursor.rowcount > 0
+    
+    def get_user_root_nodes(self, user_id: int) -> list[dict[str, Any]]:
+        """获取用户的根目录节点"""
+        return self.get_vfs_children(user_id, None)
 
-    def list_saves(self):
-        conn = self._get_conn()
-        cursor = conn.cursor()
-        cursor.execute('SELECT id, timestamp, map_name FROM save_metadata ORDER BY id DESC')
-        rows = cursor.fetchall()
-        conn.close()
-        return rows
 
-    def delete_save(self, save_id: int):
-        conn = self._get_conn()
-        cursor = conn.cursor()
-        cursor.execute('DELETE FROM equipment WHERE save_id = ?', (save_id,))
-        cursor.execute('DELETE FROM save_metadata WHERE id = ?', (save_id,))
-        conn.commit()
-        conn.close()
+# 全局数据库实例
+_db_instance: Database | None = None
 
-    def update_save(self, save_id: int, map_name: str, player_pos: tuple[int, int], equipment_slots: Dict[str, Optional[str]]):
-        conn = self._get_conn()
-        cursor = conn.cursor()
-        
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Update Metadata
-        cursor.execute('''
-            UPDATE save_metadata 
-            SET timestamp = ?, map_name = ?, player_x = ?, player_y = ?
-            WHERE id = ?
-        ''', (timestamp, map_name, player_pos[0], player_pos[1], save_id))
-        
-        # Update Equipment (Delete old, insert new)
-        cursor.execute('DELETE FROM equipment WHERE save_id = ?', (save_id,))
-        
-        for slot, item_id in equipment_slots.items():
-            if item_id:
-                cursor.execute('''
-                    INSERT INTO equipment (save_id, slot, item_id)
-                    VALUES (?, ?, ?)
-                ''', (save_id, slot, item_id))
-        
-        conn.commit()
-        conn.close()
 
-# Global instance
-save_manager = SaveManager()
+def get_database(db_path: str | Path = "save/game.db") -> Database:
+    """获取数据库单例"""
+    global _db_instance
+    if _db_instance is None:
+        _db_instance = Database(db_path)
+    return _db_instance

@@ -1,5 +1,8 @@
-from src.app import RealmTravelerApp
+"""
+《算界旅人》- 终端 RPG 游戏
+启动脚本
+"""
+from src.app import run_app
 
 if __name__ == "__main__":
-    app = RealmTravelerApp()
-    app.run()
+    run_app()
