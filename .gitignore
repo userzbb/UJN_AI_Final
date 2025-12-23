@@ -17,3 +17,5 @@ crash_title.log
 crash.log
 saves.db
 assets/fonts
+game.db
+save/game.db
