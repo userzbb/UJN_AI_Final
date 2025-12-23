@@ -20,7 +20,7 @@
 
 ### 1. 安装 uv
 
-如果还没有安装 uv，请先安装：
+如果还没有安装 uv，请先安装（详见 [uv 官网](https://docs.astral.sh/uv/)）：
 
 ```bash
 # Windows (PowerShell)
@@ -119,39 +119,24 @@ UJN_AI_Final/
     └── data/            # 数据层 (数据库、模型)
 ```
 
-## 📚 文档（DOCX）
+## 📚 开发文档
 
-- 说明：当前仓库根目录未检出任何 .docx 文档可供链接。如果你本地已有这些文档但尚未提交到仓库，请将其添加后我可以把它们在此处逐一列出并补充简要描述。
-- 临时参考：你也可以先查看项目内的设计与技术文档目录：[docs/](docs/)
+项目设计与技术文档位于 [docs/](docs/) 目录，包含项目开发的思路与架构设计：
 
-## 🌿 其他分支
+- **设计文档** [docs/design/](docs/design/)
 
-- 可用分支：目前仓库包含 `master` 与 `delta` 分支（当前默认分支可能为 `master`，而 `delta` 为并行开发分支）。
-- 切换体验：
+  - [CORE_GAMEPLAY.md](docs/design/CORE_GAMEPLAY.md) - 核心玩法设计
+  - [ERA_MECHANICAL_COMPUTING.md](docs/design/ERA_MECHANICAL_COMPUTING.md) - 机械计算时代设定
+  - [MAIN_STORY.md](docs/design/MAIN_STORY.md) - 主线剧情
 
-```bash
-git fetch --all
-git checkout delta
-```
+- **技术文档** [docs/tech/](docs/tech/)
+  - [GAME_DATA_SCHEMA.md](docs/tech/GAME_DATA_SCHEMA.md) - 游戏数据结构
+  - [TECHNICAL_DESIGN.md](docs/tech/TECHNICAL_DESIGN.md) - 技术设计文档
 
-如需我在 README 中对 `delta` 分支内容做更具体的简介，请告知关注点（例如：功能实验、UI 改动、数据结构调整等）。
+## 🌿 分支说明
 
-## 📚 文档（DOCX）
-
-- 说明：当前仓库根目录未检出任何 .docx 文档可供链接。如果你本地已有这些文档但尚未提交到仓库，请将其添加后我可以把它们在此处逐一列出并补充简要描述。
-- 临时参考：你也可以先查看项目内的设计与技术文档目录：[docs/](docs/)
-
-## 🌿 其他分支
-
-- 可用分支：目前仓库包含 `master` 与 `delta` 分支（当前默认分支可能为 `master`，而 `delta` 为并行开发分支）。
-- 切换体验：
-
-```bash
-git fetch --all
-git checkout delta
-```
-
-如需我在 README 中对 `delta` 分支内容做更具体的简介，请告知关注点（例如：功能实验、UI 改动、数据结构调整等）。
+- **`master`** - 稳定版本分支
+- **`delta`** - 当前开发分支（你现在所在的分支）
 
 ## 📄 License
 
